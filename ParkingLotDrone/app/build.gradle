@@ -98,6 +98,12 @@ dependencies {
         exclude module: 'library-anti-distortion'
         exclude module: 'fly-safe-database'
     })
+
+    implementation ('com.dji:dji-uxsdk:4.13', {
+        exclude module: 'library-anti-distortion'
+        exclude module: 'fly-safe-database'
+    })
+
     compileOnly ('com.dji:dji-sdk-provided:4.13.1')
 
     // ViewModels and Coroutines
