@@ -45,7 +45,7 @@
             android:name="com.dji.sdk.API_KEY"
             android:value="9f0f1980b093cc2730b52231" />
 
-        <activity android:name="com.riis.parking_lot_drone.ConnectionActivity"
+        <activity android:name="com.riis.parking_lot_drone.MainActivity"
             android:screenOrientation="portrait"
             android:launchMode="singleTop"
             android:configChanges="orientation">
@@ -55,16 +55,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
+            <meta-data
+                    android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
+                    android:resource="@xml/accessory_filter" />
         </activity>
-        <activity android:name="com.riis.parking_lot_drone.MainActivity"
-            android:screenOrientation="userLandscape"/>
+
     </application>
 
 </manifest>

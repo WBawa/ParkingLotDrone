@@ -1,11 +1,13 @@
 package com.riis.parking_lot_drone
 
+import android.Manifest
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import dji.common.flightcontroller.virtualstick.FlightCoordinateSystem
 import dji.common.flightcontroller.virtualstick.RollPitchControlMode
@@ -26,39 +28,40 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.VIBRATE,
+                Manifest.permission.INTERNET,
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.WAKE_LOCK,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.CHANGE_WIFI_STATE,
+                Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.SYSTEM_ALERT_WINDOW,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.RECORD_AUDIO
+            ), 1
+        )
+
         takeOffButton = findViewById(R.id.take_off_button)
         landButton = findViewById(R.id.land_button)
 
+        viewModel.startSdkRegistration(this)
         initFlightController()
 
         takeOffButton.setOnClickListener{
-//            viewModel.getFlightController()?.startTakeoff(null)
-//            showToast("Takeoff Success")
-            if (viewModel.getFlightController() == null) {
-                showToast("LOL YOU THOUGHT")
-            }
-//            viewModel.getFlightController()!!.startTakeoff { djiError ->
-//                if (djiError != null) {
-//                    Log.i(TAG, djiError.description)
-//                    showToast("Takeoff Error: ${djiError.description}")
-//                } else {
-//                    Log.i(TAG,"Takeoff Success")
-//                    showToast("Takeoff Success")
-//                }
-//            }
+            viewModel.getFlightController()!!.startTakeoff(null)
+            showToast("Takeoff Success")
         }
 
         landButton.setOnClickListener {
-            showToast("in here lol")
-            viewModel.getFlightController()?.startLanding { djiError ->
-                if (djiError != null) {
-                    Log.i(TAG, djiError.description)
-                    showToast("Landing Error: ${djiError.description}")
-                } else {
-                    Log.i(TAG,"Start Landing Success")
-                    showToast("Start Landing Success")
-                }
-            }
+            viewModel.getFlightController()!!.startLanding(null)
+            showToast("Landing Success")
         }
 
     }
@@ -67,15 +70,6 @@ class MainActivity : AppCompatActivity() {
     private fun initFlightController() {
 
         viewModel.getFlightController()?.let {
-            it.setVirtualStickModeEnabled(true) { djiError ->
-                if (djiError != null) {
-                    Log.i(TAG, djiError.description)
-                    showToast("Virtual Stick: Could not disable virtual stick")
-                } else {
-                    Log.i(TAG,"Disable Virtual Stick Success")
-                    showToast("Virtual Sticks Disabled")
-                }
-            }
             it.rollPitchControlMode = RollPitchControlMode.VELOCITY
             it.yawControlMode = YawControlMode.ANGULAR_VELOCITY
             it.verticalControlMode = VerticalControlMode.VELOCITY
