@@ -46,7 +46,7 @@
             android:value="9f0f1980b093cc2730b52231" />
 
         <activity android:name="com.riis.parking_lot_drone.MainActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="reverseLandscape"
             android:launchMode="singleTop"
             android:configChanges="orientation">
             <intent-filter>

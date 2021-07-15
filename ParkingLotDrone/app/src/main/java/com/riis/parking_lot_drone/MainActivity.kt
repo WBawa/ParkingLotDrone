@@ -1,27 +1,38 @@
 package com.riis.parking_lot_drone
 
 import android.Manifest
+import android.graphics.SurfaceTexture
 import android.os.Bundle
-import android.util.Log
+import android.view.TextureView
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.lifecycleScope
 import dji.common.flightcontroller.virtualstick.FlightCoordinateSystem
 import dji.common.flightcontroller.virtualstick.RollPitchControlMode
 import dji.common.flightcontroller.virtualstick.VerticalControlMode
 import dji.common.flightcontroller.virtualstick.YawControlMode
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import dji.common.product.Model
+import dji.sdk.base.BaseProduct
+import dji.sdk.camera.Camera
+import dji.sdk.camera.VideoFeeder
+import dji.sdk.codec.DJICodecManager
+import dji.sdk.products.Aircraft
+import dji.sdk.products.HandHeld
+import dji.sdk.sdkmanager.DJISDKManager
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
     private val TAG = MainActivity::class.java.name
 
     private lateinit var takeOffButton: Button
     private lateinit var landButton: Button
+    private lateinit var videoSurface: TextureView
+
+    private var receivedVideoDataListener: VideoFeeder.VideoDataListener? = null
+    private var codecManager: DJICodecManager? = null
+
     private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +61,13 @@ class MainActivity : AppCompatActivity() {
 
         takeOffButton = findViewById(R.id.take_off_button)
         landButton = findViewById(R.id.land_button)
+        videoSurface = findViewById(R.id.textureView)
+
+        videoSurface.surfaceTextureListener = this
+
+        receivedVideoDataListener = VideoFeeder.VideoDataListener { videoBuffer, size ->
+           codecManager?.sendDataToDecoder(videoBuffer, size)
+        }
 
         viewModel.startSdkRegistration(this)
         initFlightController()
@@ -80,5 +98,74 @@ class MainActivity : AppCompatActivity() {
 
     private fun showToast(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun getProductInstance(): BaseProduct? {
+        return DJISDKManager.getInstance().product
+    }
+
+    private fun getCameraInstance(): Camera? {
+        if (getProductInstance() == null) return null
+
+        return if (getProductInstance() is Aircraft) {
+            (getProductInstance() as Aircraft).camera
+        } else if (getProductInstance() is HandHeld) {
+            (getProductInstance() as HandHeld).camera
+        } else
+            null
+    }
+
+    private fun initPreviewer() {
+        val product: BaseProduct = getProductInstance() ?: return
+        if (!product.isConnected) {
+            showToast(getString(R.string.disconnected))
+        } else {
+            videoSurface.surfaceTextureListener = this
+            if (product.model != Model.UNKNOWN_AIRCRAFT) {
+                VideoFeeder.getInstance().primaryVideoFeed.addVideoDataListener(
+                    receivedVideoDataListener
+                )
+            }
+        }
+    }
+
+    private fun uninitPreviewer() {
+        val camera: Camera = getCameraInstance() ?: return
+        VideoFeeder.getInstance().primaryVideoFeed.addVideoDataListener(null)
+
+    }
+
+    override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+        if (codecManager == null) {
+            codecManager = DJICodecManager(this, surface, width, height)
+        }
+    }
+
+    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+    }
+
+    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
+        codecManager?.cleanSurface()
+        codecManager = null
+
+        return false
+    }
+
+    override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initPreviewer()
+    }
+
+    override fun onPause() {
+        uninitPreviewer()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        uninitPreviewer()
+        super.onDestroy()
     }
 }

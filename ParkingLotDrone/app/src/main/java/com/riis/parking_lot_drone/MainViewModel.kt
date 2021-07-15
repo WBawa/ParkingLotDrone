@@ -34,6 +34,7 @@ class MainViewModel: ViewModel(), DJISDKManager.SDKManagerCallback {
         viewModelScope.launch(Dispatchers.IO) {
             DJISDKManager.getInstance().registerApp(context, this@MainViewModel)
         }
+        Toast.makeText(context, "REGISTRATION SUCCESSFUL", Toast.LENGTH_SHORT).show()
     }
 
     fun getFlightController(): FlightController? {

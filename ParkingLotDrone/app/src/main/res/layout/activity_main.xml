@@ -7,35 +7,37 @@
         android:orientation="horizontal"
         tools:context=".MainActivity">
 
-    <dji.ux.widget.PreFlightStatusWidget
-            android:layout_width="490dp"
-            android:layout_height="66dp"
-            custom:layout_constraintStart_toStartOf="parent"
-            custom:layout_constraintTop_toTopOf="parent" />
-
     <Button
             android:text="Take Off"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            custom:layout_constraintStart_toStartOf="parent"
-            custom:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/take_off_button"
-            custom:layout_constraintTop_toTopOf="parent"
+            custom:layout_constraintStart_toStartOf="parent"
             custom:layout_constraintBottom_toBottomOf="parent"
-            custom:layout_constraintHorizontal_bias="0.499"
-            custom:layout_constraintVertical_bias="0.374" />
+            custom:layout_constraintEnd_toStartOf="@+id/land_button"
+            custom:layout_constraintHorizontal_bias="0.829"
+            android:layout_marginBottom="4dp" />
 
     <Button
             android:text="Land"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/land_button"
-            android:layout_marginTop="34dp"
-            custom:layout_constraintTop_toBottomOf="@+id/take_off_button"
             custom:layout_constraintBottom_toBottomOf="parent"
-            custom:layout_constraintEnd_toEndOf="parent"
             custom:layout_constraintStart_toStartOf="parent"
-            custom:layout_constraintHorizontal_bias="0.499"
-            custom:layout_constraintVertical_bias="0.0" />
+            custom:layout_constraintEnd_toEndOf="parent"
+            custom:layout_constraintHorizontal_bias="0.606"
+            android:layout_marginBottom="4dp" />
+
+    <TextureView
+            android:layout_width="721dp"
+            android:layout_height="331dp"
+            android:id="@+id/textureView"
+            custom:layout_constraintTop_toTopOf="parent"
+            custom:layout_constraintStart_toStartOf="parent"
+            custom:layout_constraintEnd_toEndOf="parent"
+            custom:layout_constraintBottom_toBottomOf="parent"
+            custom:layout_constraintVertical_bias="0.35"
+             />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
