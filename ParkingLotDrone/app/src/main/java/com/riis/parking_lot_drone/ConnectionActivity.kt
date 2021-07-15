@@ -4,12 +4,21 @@ import android.Manifest
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import dji.common.flightcontroller.virtualstick.FlightCoordinateSystem
+import dji.common.flightcontroller.virtualstick.RollPitchControlMode
+import dji.common.flightcontroller.virtualstick.VerticalControlMode
+import dji.common.flightcontroller.virtualstick.YawControlMode
 import dji.sdk.sdkmanager.DJISDKManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ConnectionActivity : AppCompatActivity() {
     private lateinit var mTextConnectionStatus: TextView
@@ -18,7 +27,7 @@ class ConnectionActivity : AppCompatActivity() {
     private lateinit var mBtnOpen: Button
     private lateinit var mVersionTv: TextView
 
-    private val model: ConnectionViewModel by viewModels()
+    private val model: MainViewModel by viewModels()
 
     companion object {
         const val TAG = "ConnectionActivity"
@@ -45,10 +54,9 @@ class ConnectionActivity : AppCompatActivity() {
                 Manifest.permission.READ_PHONE_STATE
             ), 1)
 
-        initUI()
-        model.registerApp()
+        model.startSdkRegistration(this)
         observers()
-
+        initUI()
     }
 
     private fun initUI() {
@@ -68,6 +76,7 @@ class ConnectionActivity : AppCompatActivity() {
     private fun observers() {
         model.connectionStatus.observe(this, Observer<Boolean> { isConnected ->
             if (isConnected) {
+                initFlightController()
                 mTextConnectionStatus.text = "Status: Connected"
                 mBtnOpen.isEnabled = true
             }
@@ -77,12 +86,35 @@ class ConnectionActivity : AppCompatActivity() {
             }
         })
 
-        model.product.observe(this, Observer { baseProduct ->
-            if (baseProduct != null && baseProduct.isConnected) {
-                mTextModelAvailable.text = baseProduct.firmwarePackageVersion
-                mTextProduct.text = baseProduct.model.displayName
-            }
+        if (model.product != null && model.product!!.isConnected) {
+            mTextModelAvailable.text = model.product!!.firmwarePackageVersion
+            mTextProduct.text = model.product!!.model.displayName
+        }
 
-        })
+    }
+
+    private fun initFlightController() {
+
+        model.getFlightController()?.let {
+            it.rollPitchControlMode = RollPitchControlMode.VELOCITY
+            it.yawControlMode = YawControlMode.ANGULAR_VELOCITY
+            it.verticalControlMode = VerticalControlMode.VELOCITY
+            it.rollPitchCoordinateSystem = FlightCoordinateSystem.BODY
+
+            it.setVirtualStickModeEnabled(true) { djiError ->
+                if (djiError != null) {
+                    Log.i(TAG, djiError.description)
+                    showToast("Virtual Stick: Could not enable virtual stick")
+                } else {
+                    Log.i(TAG,"Enable Virtual Stick Success")
+                    showToast("Virtual Sticks Enabled")
+                }
+            }
+        }
+
+    }
+
+    private fun showToast(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 }
