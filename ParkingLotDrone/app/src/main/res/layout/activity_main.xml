@@ -8,7 +8,7 @@
         tools:context=".MainActivity">
 
     <Button
-            android:text="Take Off"
+            android:text="@string/takeoff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/take_off_button"
@@ -19,7 +19,7 @@
             android:layout_marginBottom="4dp" />
 
     <Button
-            android:text="Land"
+            android:text="@string/land"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/land_button"
@@ -39,5 +39,45 @@
             custom:layout_constraintBottom_toBottomOf="parent"
             custom:layout_constraintVertical_bias="0.35"
              />
+
+    <Button
+            android:text="forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/forward_button"
+            custom:layout_constraintTop_toTopOf="parent"
+            custom:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="96dp"
+            android:layout_marginEnd="68dp" />
+
+    <Button
+            android:text="Left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/left_button"
+            custom:layout_constraintEnd_toStartOf="@+id/right_button"
+            custom:layout_constraintTop_toBottomOf="@+id/forward_button"
+            custom:layout_constraintBottom_toTopOf="@+id/back_button" />
+
+    <Button
+            android:text="back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/back_button"
+            custom:layout_constraintEnd_toEndOf="parent"
+            custom:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="76dp"
+            custom:layout_constraintTop_toBottomOf="@+id/forward_button"
+            custom:layout_constraintVertical_bias="0.219" />
+
+    <Button
+            android:text="right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="28dp"
+            custom:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/right_button"
+            custom:layout_constraintTop_toBottomOf="@+id/forward_button"
+            custom:layout_constraintBottom_toTopOf="@+id/back_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

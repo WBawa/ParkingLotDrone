@@ -73,8 +73,13 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         initFlightController()
 
         takeOffButton.setOnClickListener{
-            viewModel.getFlightController()!!.startTakeoff(null)
-            showToast("Takeoff Success")
+            viewModel.getFlightController()!!.startTakeoff {
+                if (it != null) {
+                   showToast("Takeoff Error: ${it.description}")
+                } else {
+                    showToast("Takeoff Success")
+                }
+            }
         }
 
         landButton.setOnClickListener {
