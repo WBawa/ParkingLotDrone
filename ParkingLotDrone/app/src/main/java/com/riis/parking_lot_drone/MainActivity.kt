@@ -12,7 +12,6 @@ import android.widget.ToggleButton
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.riis.kotlin_simulatordemo.OnScreenJoystickListener
 import dji.common.flightcontroller.virtualstick.*
 import dji.common.product.Model
 import dji.sdk.base.BaseProduct
@@ -23,7 +22,6 @@ import dji.sdk.products.Aircraft
 import dji.sdk.products.HandHeld
 import dji.sdk.sdkmanager.DJISDKManager
 import java.util.*
-import kotlin.math.abs
 
 class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
@@ -33,8 +31,6 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     private lateinit var landButton: Button
     private lateinit var videoSurface: TextureView
     private lateinit var autoButton: ToggleButton
-    private lateinit var mScreenJoystickLeft: OnScreenJoystick
-    private lateinit var mScreenJoystickRight: OnScreenJoystick
 
     private var receivedVideoDataListener: VideoFeeder.VideoDataListener? = null
     private var codecManager: DJICodecManager? = null
@@ -72,8 +68,6 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         landButton = findViewById(R.id.land_button)
         videoSurface = findViewById(R.id.textureView)
         autoButton = findViewById(R.id.auto_button)
-        mScreenJoystickRight = findViewById(R.id.directionJoystickRight)
-        mScreenJoystickLeft = findViewById(R.id.directionJoystickLeft)
 
         videoSurface.surfaceTextureListener = this
 
@@ -83,6 +77,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
         viewModel.startSdkRegistration(this)
         initFlightController()
+        viewModel.getFlightController()?.setVirtualStickModeEnabled(true, null)
 
         takeOffButton.setOnClickListener{
             viewModel.getFlightController()!!.startTakeoff(null)
@@ -94,21 +89,6 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             showToast("Landing Success")
         }
 
-//        val handler = Handler()
-//
-//        val runnable = Runnable {
-//            handler.removeCallbacksAndMessages(null)
-//            CoroutineScope(Dispatchers.Main).launch {
-//                viewModel.getFlightController()!!.sendVirtualStickFlightControlData(FlightControlData(10f, 1f, 10f, 10f)) {
-//                    if (it != null) {
-//                        showToast("Executing auto")
-//                    } else {
-//                        showToast("Error: ${it?.description}")
-//                    }
-//                }
-//            }
-//        }
-
         autoButton.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
 //                val verticalJoyControlMaxSpeed = 2f
@@ -119,7 +99,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
                     sendDataTask =
                         SendDataTask(10f, 10f, yawJoyControlMaxSpeed, verticalJoyControlMaxSpeed)
                     sendDataTimer = Timer()
-                    sendDataTimer?.schedule(sendDataTask, 0, 1000)
+                    sendDataTimer?.schedule(sendDataTask, 0, 200)
                 }
             } else {
                 sendDataTimer?.cancel()
@@ -127,53 +107,6 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
                 showToast("setting to null")
             }
         }
-
-
-//        mScreenJoystickRight.setJoystickListener(object : OnScreenJoystickListener {
-//            override fun onTouch(joystick: OnScreenJoystick?, pXP: Float, pYP: Float) {
-//                Log.d(TAG, "Left Stick")
-//                var pX = pXP
-//                var pY = pYP
-//                if (abs(pX) < 0.02) {
-//                    pX = 0f
-//                }
-//                if (abs(pY) < 0.02) {
-//                    pY = 0f
-//                }
-//                val pitchJoyControlMaxSpeed = 10f
-//                val rollJoyControlMaxSpeed = 10f
-//                val mPitch = (pitchJoyControlMaxSpeed * pX)
-//                val mRoll = (rollJoyControlMaxSpeed * pY)
-//                if (null == sendDataTimer) {
-//                    sendDataTask = SendDataTask(mPitch, mRoll, 0f, 0f)
-//                    sendDataTimer = Timer()
-//                    sendDataTimer?.schedule(sendDataTask, 100, 200)
-//                }
-//            }
-//        })
-//
-//        mScreenJoystickLeft.setJoystickListener(object : OnScreenJoystickListener {
-//            override fun onTouch(joystick: OnScreenJoystick?, pX: Float, pY: Float) {
-//                Log.d(TAG, "Right Stick")
-//                var pX = pX
-//                var pY = pY
-//                if (abs(pX) < 0.02) {
-//                    pX = 0f
-//                }
-//                if (abs(pY) < 0.02) {
-//                    pY = 0f
-//                }
-//                val verticalJoyControlMaxSpeed = 2f
-//                val yawJoyControlMaxSpeed = 30f
-//                val mYaw = (yawJoyControlMaxSpeed * pX)
-//                val mThrottle = (verticalJoyControlMaxSpeed * pY)
-//                if (null == sendDataTimer) {
-//                    sendDataTask = SendDataTask(0f, 0f, mYaw, mThrottle)
-//                    sendDataTimer = Timer()
-//                    sendDataTimer?.schedule(sendDataTask, 0, 200)
-//                }
-//            }
-//        })
 
 
     }
@@ -269,11 +202,10 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         private val mYaw = yaw
         private val mThrottle = throttle
 
+
         override fun run() {
-            Log.d(TAG, "BEFORE SENDING FLIGHT CONTROL DATA")
-//            viewModel.getFlightController()?.sendVirtualStickFlightControlData(FlightControlData(mPitch, mRoll, mYaw, mThrottle), null)
-            viewModel.getFlightController()?.sendVirtualStickFlightControlData(FlightControlData(50f, 0f, 0f, 100f), null)
-            Log.d(TAG, "AFTER SENDING FLIGHT CONTROL DATA")
+            viewModel.getFlightController()?.setVirtualStickModeEnabled(true, null)
+            viewModel.getFlightController()?.sendVirtualStickFlightControlData(FlightControlData(mPitch, mRoll, mYaw, mThrottle), null)
         }
     }
 }

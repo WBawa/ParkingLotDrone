@@ -72,24 +72,24 @@
             android:textOff="@string/auto"
             android:textOn="@string/auto" />
 
-    <com.riis.parking_lot_drone.OnScreenJoystick
-            android:id="@+id/directionJoystickLeft"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:background="@mipmap/joystick_bg"
-            custom:layout_constraintStart_toStartOf="parent"
-            custom:layout_constraintBottom_toBottomOf="parent" />
+<!--    <com.riis.parking_lot_drone.OnScreenJoystick-->
+<!--            android:id="@+id/directionJoystickLeft"-->
+<!--            android:layout_width="130dp"-->
+<!--            android:layout_height="130dp"-->
+<!--            android:layout_alignParentStart="true"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:background="@mipmap/joystick_bg"-->
+<!--            custom:layout_constraintStart_toStartOf="parent"-->
+<!--            custom:layout_constraintBottom_toBottomOf="parent" />-->
 
-    <com.riis.parking_lot_drone.OnScreenJoystick
-            android:id="@+id/directionJoystickRight"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:background="@mipmap/joystick_bg"
-            custom:layout_constraintEnd_toEndOf="parent"
-            custom:layout_constraintBottom_toBottomOf="parent" />
+<!--    <com.riis.parking_lot_drone.OnScreenJoystick-->
+<!--            android:id="@+id/directionJoystickRight"-->
+<!--            android:layout_width="130dp"-->
+<!--            android:layout_height="130dp"-->
+<!--            android:layout_alignParentRight="true"-->
+<!--            android:layout_alignParentBottom="true"-->
+<!--            android:background="@mipmap/joystick_bg"-->
+<!--            custom:layout_constraintEnd_toEndOf="parent"-->
+<!--            custom:layout_constraintBottom_toBottomOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
