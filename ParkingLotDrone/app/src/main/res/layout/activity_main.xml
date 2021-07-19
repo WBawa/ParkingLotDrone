@@ -26,7 +26,7 @@
             custom:layout_constraintBottom_toBottomOf="parent"
             custom:layout_constraintStart_toStartOf="parent"
             custom:layout_constraintEnd_toEndOf="parent"
-            custom:layout_constraintHorizontal_bias="0.606"
+            custom:layout_constraintHorizontal_bias="0.727"
             android:layout_marginBottom="4dp" />
 
     <TextureView
@@ -38,46 +38,58 @@
             custom:layout_constraintEnd_toEndOf="parent"
             custom:layout_constraintBottom_toBottomOf="parent"
             custom:layout_constraintVertical_bias="0.35"
-             />
+            />
 
-    <Button
-            android:text="forward"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/forward_button"
+    <dji.ux.widget.PreFlightStatusWidget
+            android:layout_width="238dp"
+            android:layout_height="25dp"
             custom:layout_constraintTop_toTopOf="parent"
-            custom:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="96dp"
-            android:layout_marginEnd="68dp" />
+            custom:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/preFlightStatusWidget"
+            android:visibility="gone"/>
 
-    <Button
-            android:text="Left"
+    <dji.ux.widget.ConnectionWidget
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            custom:layout_constraintEnd_toEndOf="parent"
+            custom:layout_constraintTop_toTopOf="parent"
+            custom:layout_constraintStart_toEndOf="@+id/preFlightStatusWidget"
+            android:layout_marginTop="4dp"
+            custom:layout_constraintHorizontal_bias="0.966" />
+
+
+    <ToggleButton
+            android:text="@string/auto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/left_button"
-            custom:layout_constraintEnd_toStartOf="@+id/right_button"
-            custom:layout_constraintTop_toBottomOf="@+id/forward_button"
-            custom:layout_constraintBottom_toTopOf="@+id/back_button" />
-
-    <Button
-            android:text="back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/back_button"
-            custom:layout_constraintEnd_toEndOf="parent"
+            custom:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="28dp"
             custom:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginEnd="76dp"
-            custom:layout_constraintTop_toBottomOf="@+id/forward_button"
-            custom:layout_constraintVertical_bias="0.219" />
+            android:layout_marginBottom="4dp"
+            android:id="@+id/auto_button"
+            custom:layout_constraintEnd_toStartOf="@+id/take_off_button"
+            custom:layout_constraintHorizontal_bias="0.671"
+            android:textOff="@string/auto"
+            android:textOn="@string/auto" />
 
-    <Button
-            android:text="right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="28dp"
+    <com.riis.parking_lot_drone.OnScreenJoystick
+            android:id="@+id/directionJoystickLeft"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:background="@mipmap/joystick_bg"
+            custom:layout_constraintStart_toStartOf="parent"
+            custom:layout_constraintBottom_toBottomOf="parent" />
+
+    <com.riis.parking_lot_drone.OnScreenJoystick
+            android:id="@+id/directionJoystickRight"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:background="@mipmap/joystick_bg"
             custom:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/right_button"
-            custom:layout_constraintTop_toBottomOf="@+id/forward_button"
-            custom:layout_constraintBottom_toTopOf="@+id/back_button" />
+            custom:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

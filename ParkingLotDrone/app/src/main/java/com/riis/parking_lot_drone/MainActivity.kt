@@ -1,18 +1,18 @@
 package com.riis.parking_lot_drone
 
 import android.Manifest
+import android.content.Context
 import android.graphics.SurfaceTexture
 import android.os.Bundle
+import android.util.Log
 import android.view.TextureView
 import android.widget.Button
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import dji.common.flightcontroller.virtualstick.FlightCoordinateSystem
-import dji.common.flightcontroller.virtualstick.RollPitchControlMode
-import dji.common.flightcontroller.virtualstick.VerticalControlMode
-import dji.common.flightcontroller.virtualstick.YawControlMode
+import dji.common.flightcontroller.virtualstick.*
 import dji.common.product.Model
 import dji.sdk.base.BaseProduct
 import dji.sdk.camera.Camera
@@ -21,6 +21,7 @@ import dji.sdk.codec.DJICodecManager
 import dji.sdk.products.Aircraft
 import dji.sdk.products.HandHeld
 import dji.sdk.sdkmanager.DJISDKManager
+import java.util.*
 
 class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
@@ -29,9 +30,13 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     private lateinit var takeOffButton: Button
     private lateinit var landButton: Button
     private lateinit var videoSurface: TextureView
+    private lateinit var autoButton: ToggleButton
 
     private var receivedVideoDataListener: VideoFeeder.VideoDataListener? = null
     private var codecManager: DJICodecManager? = null
+
+    private var sendDataTimer: Timer? = null
+    private var sendDataTask: SendDataTask? = null
 
     private val viewModel by viewModels<MainViewModel>()
 
@@ -62,6 +67,7 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         takeOffButton = findViewById(R.id.take_off_button)
         landButton = findViewById(R.id.land_button)
         videoSurface = findViewById(R.id.textureView)
+        autoButton = findViewById(R.id.auto_button)
 
         videoSurface.surfaceTextureListener = this
 
@@ -73,19 +79,49 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         initFlightController()
 
         takeOffButton.setOnClickListener{
-            viewModel.getFlightController()!!.startTakeoff {
-                if (it != null) {
-                   showToast("Takeoff Error: ${it.description}")
-                } else {
-                    showToast("Takeoff Success")
-                }
-            }
+            viewModel.getFlightController()!!.startTakeoff(null)
+            showToast("Takeoff Success")
         }
 
         landButton.setOnClickListener {
             viewModel.getFlightController()!!.startLanding(null)
             showToast("Landing Success")
         }
+
+//        val handler = Handler()
+//
+//        val runnable = Runnable {
+//            handler.removeCallbacksAndMessages(null)
+//            CoroutineScope(Dispatchers.Main).launch {
+//                viewModel.getFlightController()!!.sendVirtualStickFlightControlData(FlightControlData(10f, 1f, 10f, 10f)) {
+//                    if (it != null) {
+//                        showToast("Executing auto")
+//                    } else {
+//                        showToast("Error: ${it?.description}")
+//                    }
+//                }
+//            }
+//        }
+
+        autoButton.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+//                val verticalJoyControlMaxSpeed = 2f
+                val verticalJoyControlMaxSpeed = 12f
+                val yawJoyControlMaxSpeed = 30f
+                showToast("trying to move")
+                if (null == sendDataTimer) {
+                    sendDataTask =
+                        SendDataTask(this, 10f, 10f, yawJoyControlMaxSpeed, verticalJoyControlMaxSpeed)
+                    sendDataTimer = Timer()
+                    sendDataTimer?.schedule(sendDataTask, 0, 1000)
+                }
+            } else {
+                sendDataTimer?.cancel()
+                sendDataTimer = null
+                showToast("setting to null")
+            }
+        }
+
 
     }
 
@@ -172,5 +208,22 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
     override fun onDestroy() {
         uninitPreviewer()
         super.onDestroy()
+    }
+
+    inner class SendDataTask(context: Context, pitch: Float, roll: Float, yaw: Float, throttle: Float): TimerTask() {
+        private val mPitch = pitch
+        private val mRoll = roll
+        private val mYaw = yaw
+        private val mThrottle = throttle
+        private val mContext = context
+
+
+        override fun run() {
+//            Toast.makeText(mContext, "BEFORE CONTROL DATA SEND", Toast.LENGTH_SHORT).show()
+            Log.d(TAG, "BEFORE SENDING FLIGHT CONTROL DATA")
+//            viewModel.getFlightController()?.sendVirtualStickFlightControlData(FlightControlData(mPitch, mRoll, mYaw, mThrottle), null)
+            viewModel.getFlightController()?.sendVirtualStickFlightControlData(FlightControlData(50f, 0f, 0f, 100f), null)
+            Log.d(TAG, "AFTER SENDING FLIGHT CONTROL DATA")
+        }
     }
 }

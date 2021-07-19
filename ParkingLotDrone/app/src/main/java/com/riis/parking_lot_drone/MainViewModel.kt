@@ -16,6 +16,7 @@ import dji.sdk.flightcontroller.FlightController
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKInitEvent
 import dji.sdk.sdkmanager.DJISDKManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -24,7 +25,8 @@ class MainViewModel: ViewModel(), DJISDKManager.SDKManagerCallback {
 
     var product: BaseProduct? = null
 
-    val connectionStatus: MutableLiveData<Boolean> = MutableLiveData(false)
+    private val connectionStatus: MutableLiveData<Boolean> = MutableLiveData(false)
+
 
     companion object {
         const val TAG = "MainViewModel"
@@ -79,6 +81,7 @@ class MainViewModel: ViewModel(), DJISDKManager.SDKManagerCallback {
             Log.e(TAG, "Product is not an aircraft")
         }
     }
+
 
     override fun onInitProcess(djisdkInitEvent: DJISDKInitEvent?, i: Int) {}
     override fun onDatabaseDownloadProgress(l: Long, l1: Long) {}
