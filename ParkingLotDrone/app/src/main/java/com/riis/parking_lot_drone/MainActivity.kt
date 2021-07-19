@@ -64,6 +64,15 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             ), 1
         )
 
+        viewModel.startSdkRegistration(this)
+        initFlightController()
+        viewModel.getFlightController()?.setVirtualStickModeEnabled(true, null)
+
+        initUI()
+
+    }
+
+    private fun initUI() {
         takeOffButton = findViewById(R.id.take_off_button)
         landButton = findViewById(R.id.land_button)
         videoSurface = findViewById(R.id.textureView)
@@ -72,12 +81,9 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         videoSurface.surfaceTextureListener = this
 
         receivedVideoDataListener = VideoFeeder.VideoDataListener { videoBuffer, size ->
-           codecManager?.sendDataToDecoder(videoBuffer, size)
+            codecManager?.sendDataToDecoder(videoBuffer, size)
         }
 
-        viewModel.startSdkRegistration(this)
-        initFlightController()
-        viewModel.getFlightController()?.setVirtualStickModeEnabled(true, null)
 
         takeOffButton.setOnClickListener{
             viewModel.getFlightController()!!.startTakeoff(null)
@@ -91,13 +97,18 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
         autoButton.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-//                val verticalJoyControlMaxSpeed = 2f
-                val verticalJoyControlMaxSpeed = 12f
+                val verticalJoyControlMaxSpeed = 2f
                 val yawJoyControlMaxSpeed = 30f
                 showToast("trying to move")
+                /***********************
+                 * PITCH: POSITIVE is BACKWARD, NEGATIVE is FORWARD, Range: [-30, 30]
+                 * ROLL: POSITIVE is RIGHT, NEGATIVE is LEFT, Range: [-30, 30]
+                 * YAW: POSITIVE is RIGHT, NEGATIVE is LEFT, Range: [-360, 360]
+                 * THROTTLE: UPWARDS MOVEMENT
+                 */
                 if (null == sendDataTimer) {
                     sendDataTask =
-                        SendDataTask(10f, 10f, yawJoyControlMaxSpeed, verticalJoyControlMaxSpeed)
+                        SendDataTask(0f, 0f, 0f, 0f)
                     sendDataTimer = Timer()
                     sendDataTimer?.schedule(sendDataTask, 0, 200)
                 }
@@ -107,18 +118,15 @@ class MainActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
                 showToast("setting to null")
             }
         }
-
-
     }
-
 
     private fun initFlightController() {
 
         viewModel.getFlightController()?.let {
             it.rollPitchControlMode = RollPitchControlMode.VELOCITY
-            it.yawControlMode = YawControlMode.ANGULAR_VELOCITY
-            it.verticalControlMode = VerticalControlMode.VELOCITY
-            it.rollPitchCoordinateSystem = FlightCoordinateSystem.BODY
+            it.yawControlMode = YawControlMode.ANGLE
+            it.verticalControlMode = VerticalControlMode.POSITION
+            it.rollPitchCoordinateSystem = FlightCoordinateSystem.GROUND
         }
 
     }
